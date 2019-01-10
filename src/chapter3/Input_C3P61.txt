@@ -1,0 +1,38 @@
+import javax.xml.bind.DatatypeConverter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class C3P61 {
+    public static void main(String[] args) {
+        DigestThread thread = new DigestThread("name");
+        thread.start();
+    }
+
+    public static class DigestThread extends Thread {
+        private String filename;
+
+        public DigestThread(String filename) {
+            this.filename = filename;
+        }
+
+        @Override
+        public void run() {
+            try {
+                FileInputStream fin = new FileInputStream(filename);
+                MessageDigest sha = MessageDigest.getInstance("SHA-256");
+                DigestInputStream din = new DigestInputStream(fin, sha);
+                while (din.read() != -1){}
+                din.close();
+                String sb = filename + ": " + DatatypeConverter.printHexBinary(sha.digest());
+                System.out.println(sb);
+                fin.close();
+            } catch (NoSuchAlgorithmException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+}
